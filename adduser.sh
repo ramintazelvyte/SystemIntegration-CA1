@@ -1,7 +1,8 @@
 #!/bin/bash
 # Script to add new user
 
-clear 
+
+printf "\n\n"
 echo "==========================================================="
 echo
 if [ $(id -u) -eq 0 ]; then	
@@ -40,6 +41,8 @@ if [ $(id -u) -eq 0 ]; then
 		echo "===========================================================" 
 		[ $? -eq 0 ] && echo -e "\n\e[92mUser has been added to system!\e[0m" || echo -e "\n\e[91mFailed to add a user!\e[0m"
 		printf "\n"
+
+		sleep 2
 	fi
 else
 
@@ -49,3 +52,4 @@ else
 
 	exit 2
 fi
+

@@ -1,7 +1,16 @@
 #!/bin/bash
 # Shell scrip to login to a custom shell
 
-clear 
+printf "\n\n"
+
+echo "Do you want to add a new user? [y/n]"
+read ans
+
+if [ "$ans" == 'y' -o "$ans" == 'Y' ]; then
+        /SystemIntegration-CA1/adduser.sh
+fi
+
+clear
 
 echo -e "\e[92m =======================================\e[0m"
 echo -e "\e[92m|		LOGGING IN		|\e[0m"
@@ -37,11 +46,13 @@ if [ $? -eq 0 ]; then
 	
 	if [ $correct = $pass ]; then
 		# set default shell for the user eg /bin/sh
-		sudo chsh -s /bin/sh $username
+		sudo chsh -s /SystemIntegration-CA1/myshell.sh $username
 		
-		echo -e "\n\e[92mLogged In successfully!\e[0m"
+		echo -e "\n\e[92m Logged In successfully!\e[0m"
 		printf "\n"
-
+		
+		# sleep for 1 sec 
+		sleep 1
 		# log the user in the root mode of the user
 		su - $username
 	else
