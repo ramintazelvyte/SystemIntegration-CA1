@@ -10,7 +10,9 @@ if [ $(id -u) -eq 0 ]; then
 	read username
 	password=''
 	printf "\e[1mEnter password : \e[0m" 
+
 	
+	# Code snipped - while loop - printing stars instead of chars or nothing	
 	# Display '*' char instead of ascii chars
 	while IFS= read -r -s -n1 char; do
   		[[ -z $char ]] && { printf '\n'; break; } # ENTER pressed; output \n and break.

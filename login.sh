@@ -21,6 +21,9 @@ read username
 printf "\t\e[1mPassword : \e[0m"
 
 
+# The following while loop is a snippet
+# from the internet
+
 # Display '*' char instead of ascii chars
 while IFS= read -r -s -n1 char; do
   	[[ -z $char ]] && { printf '\n'; break; } # ENTER pressed; output \n and break.
