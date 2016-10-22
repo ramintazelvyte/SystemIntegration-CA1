@@ -15,9 +15,9 @@ echo -e "\e[4mDue Date:\e[24m\t24th October 2016"
 
 printf "\n"
 echo -e "\e[92m ===============================================\e[0m"
-echo -e "\e[92m|					       |\e[0m"
-echo -e "\e[92m|	       Welcome To MYSHELL	       |\e[0m"
-echo -e "\e[92m|					       |\e[0m"
+echo -e "\e[92m|					        |\e[0m"
+echo -e "\e[92m|	       Welcome To MYSHELL	        |\e[0m"
+echo -e "\e[92m|					        |\e[0m"
 echo -e "\e[92m ===============================================\e[0m"
 printf "\n\n"
 
