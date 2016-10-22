@@ -69,15 +69,9 @@ if [ $? -eq 0 ]; then
 	pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
 	
 	if [ $correct = $pass ]; then
-		# set default shell for the user - /bin/myshell 
-		# create a symlink between the original shell file 
-		# and the executable file in the /bin directory
-		
-		if [ ! -f /bin/myshell ]; then 
-			sudo ln -s /SystemIntegration-CA1/myshell.sh /bin/myshell
-			chmod 777 /SystemIntegration-CA1/myshell.sh
-		fi 
-		sudo chsh -s /bin/myshell $username
+		# set default shell for the user - 
+		# /SystemIntegration-CA1/bin/myshell 
+		sudo chsh -s /SystemIntegration-CA1/bin/myshell $username
 		
 		tput cup $((centerrow+8)) $centercol
 		echo "======================================"
