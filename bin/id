@@ -1,0 +1,8 @@
+#!/bin/bash
+# id command (internal)
+
+case $1 in 
+	("-u" | "-g")
+		echo `id $1 $2`
+		;;
+esac

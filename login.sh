@@ -6,19 +6,40 @@ printf "\n\n"
 echo "Do you want to add a new user? [y/n]"
 read ans
 
-if [ "$ans" == 'y' -o "$ans" == 'Y' ]; then
-        /SystemIntegration-CA1/adduser.sh
-fi
+case $ans in 
+	("y" | "Y")
+		/SystemIntegration-CA1/adduser.sh
+		;;
+	("n" | "N")
+		sleep 0.5
+		break
+		;;
+	(*)
+		echo "Error: Invalid input."
+		exit 1
+		;;
+esac
 
 clear
 
-echo -e "\e[92m =======================================\e[0m"
+cols=$(tput cols)
+rows=$(tput lines)
+width=40
+centercol=$(((cols-width)/2))
+centerrow=$(((rows-5)/2))
+
+tput cup $centerrow $centercol
+echo -e "\e[92m ====================================\e[0m"
+tput cup $((centerrow+1)) $centercol
 echo -e "\e[92m|		LOGGING IN		|\e[0m"
-echo -e "\e[92m =======================================\e[0m"
+tput cup $((centerrow+2)) $centercol
+echo -e "\e[92m ====================================\e[0m"
 echo
-printf "\t\e[1mUsername : \e[0m"
+tput cup $((centerrow+4)) $centercol
+printf "\t   \e[1mUsername : \e[0m"
 read username
-printf "\t\e[1mPassword : \e[0m"
+tput cup $((centerrow+5)) $centercol
+printf "\t   \e[1mPassword : \e[0m"
 
 
 # The following while loop is a snippet
@@ -48,26 +69,44 @@ if [ $? -eq 0 ]; then
 	pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
 	
 	if [ $correct = $pass ]; then
-		# set default shell for the user eg /bin/sh
-		sudo chsh -s /SystemIntegration-CA1/myshell.sh $username
+		# set default shell for the user - /bin/myshell 
+		# create a symlink between the original shell file 
+		# and the executable file in the /bin directory
 		
-		echo -e "\n\e[92m Logged In successfully!\e[0m"
+		if [ ! -f /bin/myshell ]; then 
+			sudo ln -s /SystemIntegration-CA1/myshell.sh /bin/myshell
+			chmod 777 /SystemIntegration-CA1/myshell.sh
+		fi 
+		sudo chsh -s /bin/myshell $username
+		
+		tput cup $((centerrow+8)) $centercol
+		echo "======================================"
+		tput cup $((centerrow+10)) $centercol
+		echo -e "\t   \e[92m Logged In successfully!\e[0m"
 		printf "\n"
 		
 		# sleep for 1 sec 
-		sleep 1
+		sleep 1.5
 		# log the user in the root mode of the user
 		su - $username
 	else
 		printf "\n"
-		echo -e "\e[91mUsername or Password incorrect\e[0m"
+		tput cup $((centerrow+8)) $centercol
+		echo "======================================"
+		tput cup $((centerrow+10)) $centercol
+		echo -e "\t\e[91mUsername or Password incorrect\e[0m"
 		printf "\n"
+		clear
 		exit 1
 	fi
 else
 	printf "\n"
-	echo -e "\e[91mUser '$username' doesn't exist! \e[0m"
+	tput cup $((centerrow+8)) $centercol
+	echo "======================================"
+	tput cup $((centerrow+10)) $centercol
+	echo -e "\t\e[91mUser '$username' doesn't exist! \e[0m"
 	printf "\n"
+	clear
 	exit 1
 fi
 

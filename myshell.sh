@@ -1,5 +1,9 @@
 #!/bin/bash
 # Custom shell 
+# Author: Raminta Zelvyte
+# Student No: C13526123
+# Assignemnt - CA1
+# Due Date: 24th October 2016
 
 
 clear
@@ -19,70 +23,57 @@ printf "\n\n"
 
 echo -e "\e[4mType 'help' or '?' to list commands\e[24m\n"
 
+# Function to print help sheet with the commands and their descriptions/usage
 gethelp()
 {
 	echo -e "\e[95mType 'help' or '?' to see this list\n\n"
-	echo -e "\e[1;4mCommand           | Description                                                   \e[1;24m\n"
-	echo 	"  pw		  | Print Working Directory"		
-        echo -e	"		  | If any command-tails are specified, they will be ignored"
-	echo -e " 		  | (External command)\n"
-	echo -e "  ifc		  | Default: Display settings for the first intf (eth0)."
-	echo -e "		  | If an intf is specified - display information for that intf"
-	echo -e " 		  | (External command)\n"
-	echo -e "  dt		  | Displays current date and time on the system"
-	echo -e "		  | (Internal command)\n"
-	echo -e "  ud		  | Display user information: "
-	echo -e " 		  | uid, gid, username, groupname, iNode for home dir."
-	echo -e " 		  | (Internal command) \n"
-	echo -e "  exit		  | Logout of the custom shell of the user."
-	echo -e " 		  | Return to the previous location.\n\n"
+	echo -e "\e[1;4mCommand           | Description                                               \e[1;24m\n"
+	echo -e "  dt\t\t  | Displays current date and time on the system"
+        echo -e "\t\t  | (Internal command)\n"
+	echo -e "  exit\t\t  | Logout from the custom shell of the user."
+        echo -e "\t\t  | Return to the previous location.\n"
+	echo -e "  history\t  | Display all of the commands entered previously."
+	echo -e "\t\t  | Quick access to commands - '!<command#>' eg. '!50'.\n"
+	echo -e "  ifc\t\t  | Default: Display settings for the first intf (eth0)."
+        echo -e "\t\t  | If an intf is specified - display information for that intf"
+	echo -e "\t\t  | (External command)\n"
+	echo -e "  pw\t\t  | Print Working Directory"		
+        echo -e	"\t\t  | If any command-tails are specified, they will be ignored"
+	echo -e "\t\t  | (External command)\n"
+	echo -e "  ud\t\t  | Display user information: "
+	echo -e "\t\t  | uid, gid, username, groupname, iNode for home dir."
+	echo -e "\t\t  | (Internal command) \n\n"
         return
 }
 
+
 helpMsg="Please refer to the help page using command 'help' or '?'"
 
-
-# created a directory to store my external commands
-# however could not get pointers to point to a path properly
-#if [ ! -d "$HOME/bin" ]; then
-#	mkdir $HOME/bin
-#fi
-#PATH=$PATH:$HOME/bin
-#
-#mybin=$HOME/bin
-#chmod 777 $mybin
-
-getpwd()
-{
-	# an external pwd command is forked
-	# it runs as a subprocess
-	echo `/bin/pwd`
-
-	# tried to create a pointer to the path of the command
-	# ln -s `/bin/pwd` "$mybin/pw"
-	#echo `$mybin/pw`
-	return
-}
 
 function getifc()
 {	
 	default=`/sbin/ifconfig eth0`
 
-	# the following 'sed' command string has been taken out as a snippet from the internet
+	# the following 'sed' command string has been taken out as a snippet 
+	# from the internet
 	# to display network interfaces in a more readable manner
 	# - each characteristic of intf displayed on a new line
 	
+	regex="s/\(:[^: ]\+\) \([^(]\)/\1\n\2/g;s/\()\)/\1\n/;s/^ \+//"
+
 	if [ $# -eq 1 ]; then
-		echo $default | sed 's/\(:[^: ]\+\) \([^(]\)/\1\n\2/g;s/\()\)/\1\n/;s/^ \+//'
+		echo $default | sed "$regex"
 	elif [ $# -eq 2 ]; then
 		case $2 in
 			("-a" | "-s" | "-v") 
-				# ignore any tail options provided, only if it's been entered as a 2nd argument
-				echo $default | sed 's/\(:[^: ]\+\) \([^(]\)/\1\n\2/g;s/\()\)/\1\n/;s/^ \+//'
+				# ignore any tail options provided, only if 
+				# it's been entered as a 2nd argument
+				echo $default | sed "$regex"
 				;;
 			("eth0" | "eth1" | "lo")
-				# display any known intf that's been specified as a 2nd argument
-				echo `/sbin/ifconfig $2` | sed 's/\(:[^: ]\+\) \([^(]\)/\1\n\2/g;s/\()\)/\1\n/;s/^ \+//'
+				# display any known intf that's been specified 
+				# as a 2nd argument
+				echo `/sbin/ifconfig $2` | sed "$regex"
 				;;
 			(*)
 				echo "ERROR: Option "$2" is not recognized"
@@ -92,9 +83,11 @@ function getifc()
 	elif [ $# -eq 3 ]; then
 		case $2 in 
 			("-a" | "-s" | "-v")
+				# if an option is specified and the intf after it is 
+				# recognized, then this intf is displayed
 				case $3 in 
 					("eth0" | "eth1" | "lo" )
-						echo `/sbin/ifconfig $3` | sed 's/\(:[^: ]\+\) \([^(]\)/\1\n\2/g;s/\()\)/\1\n/;s/^ \+//'
+						echo `/sbin/ifconfig $3` | sed "$regex"
 						;;
 					(*)
 						echo "ERROR: Option "$3" is not recognized"
@@ -115,12 +108,31 @@ function getifc()
 	return  
 }
 
+
+getud() 
+{
+	# get user details using local commands stored in /bin dir
+	uid=`/SystemIntegration-CA1/bin/id -u $username`
+	gid=`/SystemIntegration-CA1/bin/id -g $username`
+	usernm=`/SystemIntegration-CA1/bin/whoami`
+	groupnm=`/SystemIntegration-CA1/bin/id -g -n $username`
+	inode=`/SystemIntegration-CA1/bin/ls -i -d $HOME`
+	
+	echo -e "\e[1mUser ID:\e[0m " $uid
+	echo -e "\e[1mGroup ID:\e[0m " $gid
+	echo -e "\e[1mUsername:\e[0m " $usernm
+	echo -e "\e[1mGroup name:\e[0m " $groupnm
+	echo -e "\e[1mHome Dir iNode:\e[0m " $inode
+}
+
+
 function casestat {
 	case $code in
                 ("exit")
                         echo -e "\n\e[91mLogging Out\e[0m"
                         printf "\n"
                         sleep 1
+			clear
                         exit 0
                         ;;
                 ("history")
@@ -132,7 +144,7 @@ function casestat {
                         n=${code:1}
 			
 			if [ $n -ge $lines ]; then 
-				echo "ERROR: There's only "$lines" commands in history file"
+				echo "ERROR: There's only "$lines" commands in history file."
 			else  
                        		code=`sed -n "${n}{p;q;}" $hist`
 				echo "Command: "$code""
@@ -150,29 +162,30 @@ function casestat {
 		("pw" | "pw -L" | "pw -P" | "pw -LP")
                         # ignore any command-tails
                         # only print wokring directory using external pwd command
-                        getpwd
+                        echo `/bin/pwd`
                         ;;
                 ("ifc"*)
 			getifc $@
                         ;;
                 ("ud")
-                        echo "TOdO"
-                        echo "print user info using internal commands"
+			getud
                         ;;
                 ("dt")
-			now=`date +%Y%m%d%H%M%S`
+			now=`/SystemIntegration-CA1/bin/date`
 			echo -e "\e[1mCurrent Date:\e[0m " $now
                         ;;
+		("ls")
+			echo `/SystemIntegration-CA1/bin/ls`
+			;;
                 (*)
                         printf "\e[91mInvalid command.\e[0m \nPlease refer to the "
                         printf "help page using command 'help' or '?'.\n"
                         ;;
-
-
         esac
-
 }
 
+
+# set first prompt string
 PS1="$(tput setaf 6)$(whoami)$(tput sgr0)@$(hostname):$(tput setaf 2)$HOME$(tput sgr0)\$" 
 
 
@@ -195,4 +208,6 @@ do
 		echo "$code" >> "$hist"	
 	fi
 done
+
+clear
 
