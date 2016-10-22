@@ -48,6 +48,9 @@ This networking shell has been developed for the specific purpose to assist the 
     execute it. If a command number is specified, but it doesn't exist, an appropriate error will be displayed.
   - Error checking/handling is done throughout. Appropriate messages are displayed in regards to specific errors, to help the user 
     understand what errors have been encountered.
+  - When the user is done with the custom shell, using 'exit' command, the user will be logged out of the custom shell, and re-directed
+    back to the superuser account, /SystemIntegration-CA1 directory, from where the 'login' file has been executed. To exit out of the 
+    Linux system, enter 'exit' twice.
     
 ### ENJOY :) 
   
