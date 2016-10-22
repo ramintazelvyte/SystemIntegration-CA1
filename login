@@ -31,7 +31,7 @@ centerrow=$(((rows-5)/2))
 tput cup $centerrow $centercol
 echo -e "\e[92m ====================================\e[0m"
 tput cup $((centerrow+1)) $centercol
-echo -e "\e[92m|	         LOGGING IN	       |\e[0m"
+echo -e "\e[92m|	      LOGGING IN	    |\e[0m"
 tput cup $((centerrow+2)) $centercol
 echo -e "\e[92m ====================================\e[0m"
 echo
@@ -76,7 +76,7 @@ if [ $? -eq 0 ]; then
 		tput cup $((centerrow+8)) $centercol
 		echo "======================================"
 		tput cup $((centerrow+10)) $centercol
-		echo -e "\t   \e[92m Logged In successfully!\e[0m"
+		echo -e "\t\e[92m Logged In successfully!\e[0m"
 		printf "\n"
 		
 		# sleep for 1 sec 
@@ -88,8 +88,9 @@ if [ $? -eq 0 ]; then
 		tput cup $((centerrow+8)) $centercol
 		echo "======================================"
 		tput cup $((centerrow+10)) $centercol
-		echo -e "\t\e[91mUsername or Password incorrect\e[0m"
+		echo -e "   \e[91mUsername or Password incorrect\e[0m"
 		printf "\n"
+		sleep 2
 		clear
 		exit 1
 	fi
@@ -98,8 +99,9 @@ else
 	tput cup $((centerrow+8)) $centercol
 	echo "======================================"
 	tput cup $((centerrow+10)) $centercol
-	echo -e "\t\e[91mUser '$username' doesn't exist! \e[0m"
+	echo -e "    \e[91mUser '$username' doesn't exist! \e[0m"
 	printf "\n"
+	sleep 2
 	clear
 	exit 1
 fi
