@@ -31,7 +31,7 @@ centerrow=$(((rows-5)/2))
 tput cup $centerrow $centercol
 echo -e "\e[92m ====================================\e[0m"
 tput cup $((centerrow+1)) $centercol
-echo -e "\e[92m|		LOGGING IN		|\e[0m"
+echo -e "\e[92m|\t\tLOGGING IN\t\t|\e[0m"
 tput cup $((centerrow+2)) $centercol
 echo -e "\e[92m ====================================\e[0m"
 echo

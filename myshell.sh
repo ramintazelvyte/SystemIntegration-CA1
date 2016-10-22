@@ -15,9 +15,9 @@ echo -e "\e[4mDue Date:\e[24m\t24th October 2016"
 
 printf "\n"
 echo -e "\e[92m ===============================================\e[0m"
-echo -e "\e[92m|						|\e[0m"
-echo -e "\e[92m|		Welcome To MYSHELL		|\e[0m"
-echo -e "\e[92m|						|\e[0m"
+echo -e "\e[92m|\t\t\t\t\t\t\t|\e[0m"
+echo -e "\e[92m|\t\tWelcome To MYSHELL\t\t|\e[0m"
+echo -e "\e[92m|\t\t\t\t\t\t\t|\e[0m"
 echo -e "\e[92m ===============================================\e[0m"
 printf "\n\n"
 
@@ -28,8 +28,10 @@ gethelp()
 {
 	echo -e "\e[95mType 'help' or '?' to see this list\n\n"
 	echo -e "\e[1;4mCommand           | Description                                               \e[1;24m\n"
+	echo -e "  cdir\t\t  | Change directories. eg. 'cdir bin'.\n"
 	echo -e "  dt\t\t  | Displays current date and time on the system"
         echo -e "\t\t  | (Internal command)\n"
+	echo -e "  edit\t\t  | Edit files (vi mode). eg. 'edit tmp.txt'.\n"
 	echo -e "  exit\t\t  | Logout from the custom shell of the user."
         echo -e "\t\t  | Return to the previous location.\n"
 	echo -e "  history\t  | Display all of the commands entered previously."
@@ -37,9 +39,14 @@ gethelp()
 	echo -e "  ifc\t\t  | Default: Display settings for the first intf (eth0)."
         echo -e "\t\t  | If an intf is specified - display information for that intf"
 	echo -e "\t\t  | (External command)\n"
+	echo -e "  ls\t\t  | List current files and directories.\n"
+	echo -e "  newdir\t  | Create new directory. eg. 'newdir tmp'.\n"
+	echo -e "  newfile\t  | Create a new file. eg. 'newfile tmp.txt'.\n"
 	echo -e "  pw\t\t  | Print Working Directory"		
         echo -e	"\t\t  | If any command-tails are specified, they will be ignored"
 	echo -e "\t\t  | (External command)\n"
+	echo -e "  return\t  | Go back a single directory.\n"
+	echo -e "  rmv\t\t  | Delete files or directories. eg. 'rmv tmp.txt'.\n"
 	echo -e "  ud\t\t  | Display user information: "
 	echo -e "\t\t  | uid, gid, username, groupname, iNode for home dir."
 	echo -e "\t\t  | (Internal command) \n\n"
@@ -54,7 +61,7 @@ function getifc()
 {	
 	default=`/sbin/ifconfig eth0`
 
-	# the following 'sed' command string has been taken out as a snippet 
+	# the following 'regex' string has been taken out as a snippet 
 	# from the internet
 	# to display network interfaces in a more readable manner
 	# - each characteristic of intf displayed on a new line
@@ -62,6 +69,7 @@ function getifc()
 	regex="s/\(:[^: ]\+\) \([^(]\)/\1\n\2/g;s/\()\)/\1\n/;s/^ \+//"
 
 	if [ $# -eq 1 ]; then
+		# if no command-tails are specified, default intf is displayed
 		echo $default | sed "$regex"
 	elif [ $# -eq 2 ]; then
 		case $2 in
@@ -126,6 +134,112 @@ getud()
 }
 
 
+createdir()
+{
+	# create new dirs without supporting any commaind-tails
+	if [ $# -eq 2 ]; then
+		if [ ! -d $2 ]; then
+			`mkdir $2`
+		else
+			echo -e "\e[91mDirectory $2 already exists!\e[0m"
+		fi
+	else
+		echo -e "\e[91mOnly one directory can be created at a time."
+		echo -e "Please specify only one directory name.\e[0m."
+	fi
+}
+
+
+changedir() 
+{
+	# change directories
+	if [ $# -eq 2 ]; then 
+		if [ -d $2 ]; then
+			# attach absolute path - for accurate location
+			newpath="$(pwd)/"$2
+			cd $newpath
+			# reset PS1 to update current location after changing dirs 
+			 PS1="$(tput setaf 6)$(whoami)$(tput sgr0)@$(hostname):$(tput setaf 2)$(pwd)$(tput sgr0)\$"
+		else
+			echo -e "\e[91mThis directory doesn't exist!\e[0m"
+		fi
+	else 
+		echo -e "\e[91mInvalid command!\e[0m"
+		echo $helpMsg
+	fi
+}
+
+changeback()
+{
+	# if home directory hasn't been reached yet
+	# move bach by a single directory only
+	if [ ! $(pwd) = $HOME ]; then
+		cd ..
+		PS1="$(tput setaf 6)$(whoami)$(tput sgr0)@$(hostname):$(tput setaf 2)$(pwd)$(tput sgr0)\$"
+	else
+		echo -e "\e[91mReached home directory.\e[0m"
+	fi	
+}
+
+
+makefile()
+{
+	# create new files
+	if [ $# -eq 2 ]; then
+                if [ ! -f $2 ]; then
+			# attach absolute path - for accurate location
+                        newpath="$(pwd)/"$2
+			touch $newpath
+                else
+                        echo -e "\e[91mThis file already exists!\e[0m"
+                fi
+        else
+                echo -e "\e[91mInvalid command!\e[0m"
+                echo $helpMsg
+        fi
+}
+
+
+edit()
+{
+	# edit any type of file using vi editor
+	 if [ $# -eq 2 ]; then
+                if [ -f $2 ]; then
+			# attach absolute path - for accurate location
+                        newpath="$(pwd)/"$2
+                        vi $newpath
+                else
+                        echo -e "\e[91mThis file doesn't exist!\e[0m"
+                fi
+        else
+                echo -e "\e[91mInvalid command!\e[0m"
+                echo $helpMsg
+        fi
+}
+
+
+delete()
+{
+	# delete files or directories
+	 if [ $# -eq 2 ]; then
+                newpath="$(pwd)/"$2
+		if [ -d $2 ]; then
+			# recursively delete directory
+			# including all the files that are in it
+                        rm -r $2
+                elif [ -f $2 ]; then
+			# delete files
+			rm $2
+		else
+			echo -e "\e[91mFailed to delete $2 .\e[0m"
+                fi
+        else
+                echo -e "\e[91mInvalid command!\e[0m"
+                echo $helpMsg
+        fi
+}
+
+
 function casestat {
 	case $code in
                 ("exit")
@@ -177,6 +291,24 @@ function casestat {
 		("ls")
 			echo `/SystemIntegration-CA1/bin/ls`
 			;;
+		("newdir"*)
+			createdir $@
+			;;
+		("cdir"*)
+			changedir $@
+			;;
+		("return")
+			changeback 
+			;;
+		("newfile"*)
+			makefile $@
+			;;
+		("edit"*)
+			edit $@
+			;;
+		("rmv"*)
+			delete $@
+			;;
                 (*)
                         printf "\e[91mInvalid command.\e[0m \nPlease refer to the "
                         printf "help page using command 'help' or '?'.\n"
@@ -186,7 +318,7 @@ function casestat {
 
 
 # set first prompt string
-PS1="$(tput setaf 6)$(whoami)$(tput sgr0)@$(hostname):$(tput setaf 2)$HOME$(tput sgr0)\$" 
+PS1="$(tput setaf 6)$(whoami)$(tput sgr0)@$(hostname):$(tput setaf 2)$(pwd)$(tput sgr0)\$" 
 
 
 # get the file where commands will be stored
